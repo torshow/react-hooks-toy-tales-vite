@@ -32,6 +32,23 @@ function App() {
       setToys((currentToys) => currentToys.filter((toy) => toy.id !== id));
     });
   }
+  
+  //increase a toy's like on the server then update state in place
+  function updateToysLikes(id) {
+    const toyToUpdate = toys.find((toy) => toy.id === id);
+
+    fetch(`http://localhost:3001/toys/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ likes: toyToUpdate.likes + 1 }),
+    })
+      .then((res) => res.json())
+      .then((updatedToy) => {
+        setToys((currentToys) =>
+          currentToys.map((toy) => (toy.id === id ? updatedToy : toy))
+        );
+      });
+  }
 
   return (
     <>
@@ -40,7 +57,7 @@ function App() {
       <div className="buttonContainer">
         <button onClick={handleClick}>Add a Toy</button>
       </div>
-      <ToyContainer toys={toys} onDeleteToy={deleteToy} />
+      <ToyContainer toys={toys} onDeleteToy={deleteToy} onUpdateLikes={updateToysLikes}/>
     </>
   );
 }
